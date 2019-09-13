@@ -227,7 +227,7 @@ THREE.FSOFLoader = (function() {
                 alpha |= data[blockI++] << 8;
                 alpha |= data[blockI++] << 16;
                 alpha |= data[blockI++] << 24;
-                var alpha2 |= data[blockI-1] >> 6;
+                var alpha2 = data[blockI-1] >> 6;
                 alpha2 |= data[blockI++] << 2;
                 alpha2 |= data[blockI++] << 10;
 
