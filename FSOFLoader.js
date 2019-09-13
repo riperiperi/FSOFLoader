@@ -213,6 +213,7 @@ THREE.FSOFLoader = (function() {
         var blockH = height >> 2;
         var blockI = 0;
         var targI = 0;
+        var mfactor = 31/255;
 
         for (var by = 0; by < blockH; by++)
         {
@@ -236,9 +237,9 @@ THREE.FSOFLoader = (function() {
 
                 var minCI = data[blockI++];
                 minCI |= data[blockI++] << 8;
-                
-                var maxCol = [Math.round((maxCI >> 11) & 31), Math.round((maxCI >> 6) & 31), Math.round(maxCI & 31), 255];
-                var minCol = [Math.round((minCI >> 11) & 31), Math.round((minCI >> 6) & 31), Math.round(minCI & 31), 255];
+
+                var maxCol = [Math.round(((maxCI >> 11) & 31) * mfactor), Math.round(((maxCI >> 6) & 31) * mfactor), Math.round((maxCI & 31) * mfactor), 255];
+                var minCol = [Math.round(((minCI >> 11) & 31) * mfactor), Math.round(((minCI >> 6) & 31) * mfactor), Math.round((minCI & 31) * mfactor), 255];
 
                 var col = data[blockI++];
                 col |= data[blockI++] << 8;
