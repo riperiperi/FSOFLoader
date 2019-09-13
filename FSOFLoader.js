@@ -213,7 +213,7 @@ THREE.FSOFLoader = (function() {
         var blockH = height >> 2;
         var blockI = 0;
         var targI = 0;
-        var mfactor = 31/255;
+        var mfactor = 255/31;
 
         for (var by = 0; by < blockH; by++)
         {
