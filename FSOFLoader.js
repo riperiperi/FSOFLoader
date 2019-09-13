@@ -179,7 +179,14 @@ THREE.FSOFLoader = (function() {
                     COMPRESSED_RGBA_S3TC_DXT5_EXT: 0x83F3,
                 };
 
-                var texture = new THREE.CompressedTexture([{data: new Uint8Array(data), width: width, height: height}], width, height, FORMATS.COMPRESSED_RGBA_S3TC_DXT5_EXT);
+                var supportsCompressed = false;
+                var texture;
+                if (supportsCompressed) {
+                    texture = new THREE.CompressedTexture([{data: new Uint8Array(data), width: width, height: height}], width, height, FORMATS.COMPRESSED_RGBA_S3TC_DXT5_EXT);
+                } else {
+                    texture = new THREE.DataTexture(DXT5Decompress(data, width, height), width, height, THREE.RGBAFormat);
+                }
+
                 texture.minFilter = THREE.LinearFilter;
                 texture.magFilter = THREE.LinearFilter;
                 texture.generateMipmaps = false;
@@ -194,6 +201,94 @@ THREE.FSOFLoader = (function() {
             return group;
         }
     };
+
+    function colLerp(c1, c2, i) {
+        let ii = 1-i;
+        return [Math.round(c1[0] * ii + c2[0] * i), Math.round(c1[1] * ii + c2[1] * i), Math.round(c1[2] * ii + c2[2] * i), Math.round(c1[3] * ii + c2[3] * i)]
+    }
+
+    function DXT5Decompress(data, width, height) {
+        var result = [];//new Uint8Array(width * height * 4);
+        var blockW = width >> 2;
+        var blockH = height >> 2;
+        var blockI = 0;
+        var targI = 0;
+
+        for (var by = 0; by < blockH; by++)
+        {
+            for (var bx = 0; bx < blockW; bx++)
+            {
+                //
+                var maxA = data[blockI++];
+                var minA = data[blockI++];
+
+                var targ2I = targI;
+                var alpha = data[blockI++];
+                alpha |= data[blockI++] << 8;
+                alpha |= data[blockI++] << 16;
+                alpha |= data[blockI++] << 24;
+                var alpha2 |= data[blockI-1] >> 6;
+                alpha2 |= data[blockI++] << 2;
+                alpha2 |= data[blockI++] << 10;
+
+                var maxCI = data[blockI++];
+                maxCI |= data[blockI++] << 8;
+
+                var minCI = data[blockI++];
+                minCI |= data[blockI++] << 8;
+                
+                var maxCol = [Math.round((maxCI >> 11) & 31), Math.round((maxCI >> 6) & 31), Math.round(maxCI & 31), 255];
+                var minCol = [Math.round((minCI >> 11) & 31), Math.round((minCI >> 6) & 31), Math.round(minCI & 31), 255];
+
+                var col = data[blockI++];
+                col |= data[blockI++] << 8;
+                col |= data[blockI++] << 16;
+                col |= data[blockI++] << 24;
+
+                var i = 0;
+                for (var y=0; y<4; y++)
+                {
+                    for (var x=0; x<4; x++)
+                    {
+                        var abit;
+                        if (i*3 >= 30) {
+                            abit = (alpha2 >> ((i*3)-30)) & 0x7;
+                        } else {
+                            abit = (alpha >> (i*3)) & 0x7;
+                        }
+                        var cbit = (col >> (i * 2)) & 0x3;
+                        i++;
+                        var col2;
+                        switch (cbit)
+                        {
+                            case 1:
+                                col2 = minCol; break;
+                            case 2:
+                                col2 = colLerp(minCol, maxCol, 2 / 3.0); break;
+                            case 3:
+                                col2 = colLerp(minCol, maxCol, 1 / 3.0); break;
+                            default:
+                                col2 = maxCol; break;
+                        }
+                        if (abit == 0) col2[3] = maxA;
+                        else if (abit == 1) col2[3] = minA;
+                        else
+                        {
+                            var a = (8 - abit) / 7.0;
+                            col2[3] = Math.round(maxA*a + minA * (1-a));
+                        }
+                        
+                        result[targ2I++] = col2;
+                    }
+                    targ2I += width - 4;
+                }
+                targI += 4;
+            }
+            targI += width * 3;
+        }
+
+        return new Uint8Array([].concat.apply([], result));
+    }
 
     return FSOFLoader;
 })();
