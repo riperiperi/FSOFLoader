@@ -64,8 +64,8 @@ class ExampleFSOFScene {
         let light = new THREE.DirectionalLight( 0xffffff );
         light.position.set(-75, 200, -75);
         light.castShadow = true;
-        light.shadow.camera.top = 0;
-        light.shadow.camera.bottom = -75;
+        light.shadow.camera.top = 100;
+        light.shadow.camera.bottom = 0;
         light.shadow.camera.left = -50;
         light.shadow.camera.right = 50;
         light.shadow.bias = -0.001;
