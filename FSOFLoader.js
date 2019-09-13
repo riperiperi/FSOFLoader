@@ -184,7 +184,7 @@ THREE.FSOFLoader = (function() {
                 if (supportsCompressed) {
                     texture = new THREE.CompressedTexture([{data: new Uint8Array(data), width: width, height: height}], width, height, FORMATS.COMPRESSED_RGBA_S3TC_DXT5_EXT);
                 } else {
-                    texture = new THREE.DataTexture(DXT5Decompress(data, width, height), width, height, THREE.RGBAFormat);
+                    texture = new THREE.DataTexture(DXT5Decompress(new Uint8Array(data), width, height), width, height, THREE.RGBAFormat);
                 }
 
                 texture.minFilter = THREE.LinearFilter;
