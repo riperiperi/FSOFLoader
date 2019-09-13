@@ -209,8 +209,8 @@ THREE.FSOFLoader = (function() {
 
     function DXT5Decompress(data, width, height) {
         var result = [];//new Uint8Array(width * height * 4);
-        var blockW = width >> 2;
-        var blockH = height >> 2;
+        var blockW = width >>> 2;
+        var blockH = height >>> 2;
         var blockI = 0;
         var targI = 0;
         var mfactor = 255/31;
@@ -228,7 +228,7 @@ THREE.FSOFLoader = (function() {
                 alpha |= data[blockI++] << 8;
                 alpha |= data[blockI++] << 16;
                 alpha |= data[blockI++] << 24;
-                var alpha2 = data[blockI-1] >> 6;
+                var alpha2 = data[blockI-1] >>> 6;
                 alpha2 |= data[blockI++] << 2;
                 alpha2 |= data[blockI++] << 10;
 
@@ -238,8 +238,8 @@ THREE.FSOFLoader = (function() {
                 var minCI = data[blockI++];
                 minCI |= data[blockI++] << 8;
 
-                var maxCol = [Math.round(((maxCI >> 11) & 31) * mfactor), Math.round(((maxCI >> 6) & 31) * mfactor), Math.round((maxCI & 31) * mfactor), 255];
-                var minCol = [Math.round(((minCI >> 11) & 31) * mfactor), Math.round(((minCI >> 6) & 31) * mfactor), Math.round((minCI & 31) * mfactor), 255];
+                var maxCol = [Math.round(((maxCI >>> 11) & 31) * mfactor), Math.round(((maxCI >>> 6) & 31) * mfactor), Math.round((maxCI & 31) * mfactor), 255];
+                var minCol = [Math.round(((minCI >>> 11) & 31) * mfactor), Math.round(((minCI >>> 6) & 31) * mfactor), Math.round((minCI & 31) * mfactor), 255];
 
                 var col = data[blockI++];
                 col |= data[blockI++] << 8;
@@ -253,11 +253,11 @@ THREE.FSOFLoader = (function() {
                     {
                         var abit;
                         if (i*3 >= 30) {
-                            abit = (alpha2 >> ((i*3)-30)) & 0x7;
+                            abit = (alpha2 >>> ((i*3)-30)) & 0x7;
                         } else {
-                            abit = (alpha >> (i*3)) & 0x7;
+                            abit = (alpha >>> (i*3)) & 0x7;
                         }
-                        var cbit = (col >> (i * 2)) & 0x3;
+                        var cbit = (col >>> (i * 2)) & 0x3;
                         i++;
                         var col2;
                         switch (cbit)
