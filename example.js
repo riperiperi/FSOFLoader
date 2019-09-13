@@ -51,6 +51,8 @@ class ExampleFSOFScene {
         let domElement = this.renderer.domElement;
         target.appendChild(domElement);
 
+        THREE.FSOFCheckSupport(this.renderer);
+
         this.camera = new THREE.PerspectiveCamera(45, domElement.clientWidth/domElement.clientHeight, 1, 1000);
         this.camera.position.z = 3;
 

@@ -1,3 +1,7 @@
+THREE.FSOFCompressedSupport = false;
+THREE.FSOFCheckSupport = function (renderer) {
+    THREE.FSOFCompressedSupport = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
+}
 THREE.FSOFLoader = (function() {
 
     function FSOFLoader(manager) {
@@ -263,13 +267,13 @@ THREE.FSOFLoader = (function() {
                         switch (cbit)
                         {
                             case 1:
-                                col2 = minCol; break;
+                                col2 = minCol.slice(0); break;
                             case 2:
                                 col2 = colLerp(minCol, maxCol, 2 / 3.0); break;
                             case 3:
                                 col2 = colLerp(minCol, maxCol, 1 / 3.0); break;
                             default:
-                                col2 = maxCol; break;
+                                col2 = maxCol.slice(0); break;
                         }
                         if (abit == 0) col2[3] = maxA;
                         else if (abit == 1) col2[3] = minA;
@@ -288,7 +292,12 @@ THREE.FSOFLoader = (function() {
             targI += width * 3;
         }
 
-        return new Uint8Array([].concat.apply([], result));
+        var final = [];
+        for (var i=0; i<result.length; i++) {
+            final.push.apply(final, result[i]);
+        }
+
+        return new Uint8Array(final); //new Uint8Array([].concat.apply([], result));
     }
 
     return FSOFLoader;
