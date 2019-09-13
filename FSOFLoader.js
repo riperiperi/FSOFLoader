@@ -183,7 +183,7 @@ THREE.FSOFLoader = (function() {
                     COMPRESSED_RGBA_S3TC_DXT5_EXT: 0x83F3,
                 };
 
-                var supportsCompressed = false;
+                var supportsCompressed = THREE.FSOFCompressedSupport;
                 var texture;
                 if (supportsCompressed) {
                     texture = new THREE.CompressedTexture([{data: new Uint8Array(data), width: width, height: height}], width, height, FORMATS.COMPRESSED_RGBA_S3TC_DXT5_EXT);
